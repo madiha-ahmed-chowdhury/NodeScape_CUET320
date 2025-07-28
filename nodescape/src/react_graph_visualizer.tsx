@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
+import './GraphTraversalVisualizer.css';
 import { Play, Pause, RotateCcw, Trash2, Plus, AlertCircle, CheckCircle, Settings } from 'lucide-react';
 
 // Define types
