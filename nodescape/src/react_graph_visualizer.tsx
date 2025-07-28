@@ -50,8 +50,9 @@ const GraphTraversalVisualizer = () => {
 
   // Canvas dimensions
   const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = 500;
-  const NODE_RADIUS = 30;
+  const CANVAS_HEIGHT = 400;
+
+  const NODE_RADIUS = 10;
 
   // Show message to user
   const showMessage = (text: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -309,12 +310,26 @@ const GraphTraversalVisualizer = () => {
       ));
       
       // Add neighbors to queue
-      const neighbors = adjacencyList[current] || [];
-      neighbors.forEach(neighbor => {
-        if (!visited.has(neighbor)) {
-          queue.push(neighbor);
+const neighbors = adjacencyList[current] || [];
+neighbors.forEach(neighbor => {
+  if (!visited.has(neighbor)) {
+    queue.push(neighbor);
+
+    // Mark edge as traversed
+    setEdges(prevEdges =>
+      prevEdges.map(edge => {
+        if (
+          (edge.from.id === current && edge.to.id === neighbor) ||
+          (edge.from.id === neighbor && edge.to.id === current)
+        ) {
+          return { ...edge, traversed: true };
         }
-      });
+        return edge;
+      })
+    );
+  }
+});
+
     }
     return order;
   };
@@ -356,14 +371,27 @@ const GraphTraversalVisualizer = () => {
         n.id === node ? { ...n, current: false } : n
       ));
       
-      // Visit neighbors
-      const neighbors = adjacencyList[node] || [];
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          await dfsRecursive(neighbor);
-        }
-      }
-    };
+  // Visit neighbors
+  const neighbors = adjacencyList[node] || [];
+  for (const neighbor of neighbors) {
+    if (!visited.has(neighbor)) {
+      // Mark edge as traversed
+      setEdges(prevEdges =>
+        prevEdges.map(edge => {
+          if (
+            (edge.from.id === node && edge.to.id === neighbor) ||
+            (edge.from.id === neighbor && edge.to.id === node)
+          ) {
+            return { ...edge, traversed: true };
+          }
+          return edge;
+        })
+      );
+      await dfsRecursive(neighbor);
+    }
+  }
+
+};
     
     await dfsRecursive(startNode);
     return order;
